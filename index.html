@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Semester Desk</title>
+<meta name="description" content="A study hub for CSE students: CGPA calculator, attendance tracker, deadlines, DSA practice counter, focus timer and resource library.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232447D6'/%3E%3Cpath d='M8 9h16M8 16h16M8 23h10' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="wrap gate" id="gate">
+  <section class="gate-intro">
+    <h1>Semester Desk</h1>
+    <p>Sign in to open your own CGPA, attendance, deadlines, DSA count and study log.</p>
+    <ul class="inside">
+      <li><b>CGPA</b><span>Credit-weighted, with a target planner</span></li>
+      <li><b>Attendance</b><span>Classes you can skip, per subject</span></li>
+      <li><b>Deadlines</b><span>Overdue and due-soon flags</span></li>
+      <li><b>DSA</b><span>Problems solved by topic</span></li>
+      <li><b>Focus</b><span>Timed sessions with a weekly log</span></li>
+      <li><b>Library</b><span>Courses, practice sites and tools</span></li>
+    </ul>
+  </section>
+  <section class="panel gate-card" aria-labelledby="gTitle">
+    <h2 id="gTitle">Sign in</h2>
+    <div class="gopt" id="gClaude">
+      <span class="lbl">Claude account</span>
+      <p class="msg" id="gClaudeMsg">Your data syncs to your account and stays private to you.</p>
+      <button class="btn pri" id="gClaudeBtn" data-act="gclaude" disabled>Checking your account&hellip;</button>
+    </div>
+    <div class="gor" id="gOr" aria-hidden="true"><span>or</span></div>
+    <form class="gopt" id="gateForm" autocomplete="off">
+      <span class="lbl">This device only</span>
+      <label class="f"><span class="msg">Your name</span><input class="in" id="g-name" maxlength="30" placeholder="e.g. Ravi"></label>
+      <div class="chips" id="gProfiles"></div>
+      <button class="btn" type="submit">Continue on this device</button>
+      <p class="msg">There is no password. Anyone who opens this page in this browser can open these profiles. Their data never leaves the browser.</p>
+    </form>
+    <p class="err" id="gErr" role="alert" hidden></p>
+  </section>
+</div>
+
+<div class="wrap" id="app" hidden>
+  <header class="top">
+    <div>
+      <h1>Semester Desk</h1>
+      <p>CGPA, attendance, deadlines, DSA practice and study timer for your CSE semester.</p>
+    </div>
+    <div class="topr">
+      <div class="stamp" id="stamp"></div>
+      <div class="acct">
+        <img id="whoImg" alt="" width="32" height="32" hidden>
+        <div class="whotx"><b id="whoName"></b><span class="lbl" id="whoMode"></span></div>
+        <span class="lbl" id="saveStat" aria-live="polite"></span>
+        <button class="btn sm" data-act="signout">Sign out</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs" aria-label="Sections"></nav>
+
+  <div id="sampleBar" class="notice" hidden>
+    <p><b>Example data is loaded</b> so you can see how each tool works. Edit it, or start with a blank desk. Everything is saved in this browser only.</p>
+    <div>
+      <button class="btn sm" data-act="keep" id="btnKeep">Keep and edit</button>
+      <button class="btn sm pri" data-act="fresh" id="btnFresh">Start fresh</button>
+    </div>
+  </div>
+
+  <main>
+    <!-- OVERVIEW -->
+    <section class="view" id="view-overview" hidden>
+      <div class="panel">
+        <div class="row2" style="margin-bottom:10px"><h2>Needs attention</h2></div>
+        <div class="alerts" id="ovAlerts"></div>
+      </div>
+      <div class="grid">
+        <div class="panel stack-col" id="ovCgpa"></div>
+        <div class="panel stack-col" id="ovAtt"></div>
+        <div class="panel stack-col" id="ovTasks"></div>
+        <div class="panel stack-col" id="ovDsa"></div>
+        <div class="panel stack-col" id="ovFocus"></div>
+      </div>
+    </section>
+
+    <!-- CGPA -->
+    <section class="view" id="view-cgpa" hidden>
+      <div class="vhead"><h2>CGPA calculator</h2><p>Credit-weighted. Leave a grade blank for a course still in progress.</p></div>
+      <div class="cg">
+        <div class="panel resbox res">
+          <div>
+            <span class="lbl">Overall CGPA</span>
+            <div class="big" id="cgpaBig">–</div>
+            <p class="msg" id="cgpaMeta"></p>
+          </div>
+          <div class="fields">
+            <label class="f"><span class="lbl">Grading scale</span>
+              <select class="in" id="scale" data-k="scale"></select></label>
+            <label class="f"><span class="lbl">CGPA to % factor</span>
+              <input class="in num" id="factor" type="number" min="1" max="20" step="0.1" inputmode="decimal" data-k="factor"></label>
+          </div>
+          <div class="row2"><span class="lbl">Approx. percentage</span><b class="mono" id="cgpaPct">–</b></div>
+          <p class="msg">The factor differs between universities. Check your own regulations. Switching the scale keeps grade letters that exist on both scales, so re-check each course.</p>
+          <div class="plan">
+            <h3>Target planner</h3>
+            <div class="fields">
+              <label class="f"><span class="lbl">Target CGPA</span>
+                <input class="in num" id="tcgpa" type="number" min="0" step="0.01" inputmode="decimal" data-k="tcgpa"></label>
+              <label class="f"><span class="lbl">Next sem credits</span>
+                <input class="in num" id="tcredits" type="number" min="1" max="40" step="1" inputmode="numeric" data-k="tcredits"></label>
+            </div>
+            <p class="out" id="planOut"></p>
+          </div>
+        </div>
+        <div class="sems stack-col">
+          <div id="semList" class="stack-col"></div>
+          <div><button class="btn" data-act="addsem">Add semester</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ATTENDANCE -->
+    <section class="view" id="view-attendance" hidden>
+      <div class="vhead"><h2>Attendance tracker</h2><p>Mark each class as it happens. See how many you can skip.</p></div>
+      <div class="panel">
+        <form id="attForm" class="addrow" autocomplete="off">
+          <label class="f"><span class="lbl">Subject</span><input class="in" id="att-new-name" placeholder="e.g. Computer Networks"></label>
+          <label class="f"><span class="lbl">Attended</span><input class="in num" id="att-new-att" type="number" min="0" value="0" inputmode="numeric"></label>
+          <label class="f"><span class="lbl">Total</span><input class="in num" id="att-new-tot" type="number" min="0" value="0" inputmode="numeric"></label>
+          <button class="btn pri" type="submit">Add subject</button>
+        </form>
+        <p class="err" id="attErr" style="margin-top:8px" hidden></p>
+        <div class="fields" style="margin-top:12px;max-width:260px">
+          <label class="f"><span class="lbl">Minimum required (%)</span>
+            <input class="in num" id="att-min" type="number" min="1" max="100" step="1" inputmode="numeric" data-k="attmin"></label>
+        </div>
+      </div>
+      <div class="grid" id="attGrid"></div>
+    </section>
+
+    <!-- TASKS -->
+    <section class="view" id="view-tasks" hidden>
+      <div class="vhead"><h2>Deadlines and tasks</h2><p id="taskCount"></p></div>
+      <div class="panel">
+        <form id="taskForm" class="taskform" autocomplete="off">
+          <label class="f"><span class="lbl">Task</span><input class="in" id="task-title" placeholder="e.g. Finish OS lab record"></label>
+          <label class="f"><span class="lbl">Subject</span><input class="in" id="task-subject" placeholder="Optional"></label>
+          <label class="f"><span class="lbl">Due date</span><input class="in" id="task-due" type="date"></label>
+          <label class="f"><span class="lbl">Priority</span>
+            <select class="in" id="task-pri"><option value="high">High</option><option value="med" selected>Medium</option><option value="low">Low</option></select></label>
+          <button class="btn pri" type="submit">Add task</button>
+        </form>
+        <p class="err" id="taskErr" style="margin-top:8px" hidden></p>
+      </div>
+      <div class="seg" role="group" aria-label="Filter tasks" style="align-self:flex-start">
+        <button class="segb" data-act="tfilter" data-f="open" aria-pressed="true">Open</button>
+        <button class="segb" data-act="tfilter" data-f="done" aria-pressed="false">Done</button>
+        <button class="segb" data-act="tfilter" data-f="all" aria-pressed="false">All</button>
+      </div>
+      <div class="panel"><ul class="tasks" id="taskList"></ul></div>
+    </section>
+
+    <!-- DSA -->
+    <section class="view" id="view-dsa" hidden>
+      <div class="vhead"><h2>DSA practice</h2><p>Count problems solved by topic and difficulty.</p></div>
+      <div class="panel dsa-sum">
+        <div class="stack-col">
+          <span class="lbl">Solved</span>
+          <div class="row2" style="justify-content:flex-start;align-items:baseline;gap:8px">
+            <span class="big" id="dsaSolved">0</span><span class="muted">of</span>
+            <input class="in num" id="dsa-target" type="number" min="1" step="10" inputmode="numeric" data-k="dsatarget" style="width:96px" aria-label="Target problems">
+          </div>
+          <div class="bar" id="dsaBar"><i style="width:0"></i></div>
+        </div>
+        <div class="stack-col">
+          <div class="legend" id="dsaLegend"></div>
+          <p class="msg" id="dsaHint"></p>
+        </div>
+      </div>
+      <form id="dsaForm" class="row2" style="justify-content:flex-start;flex-wrap:wrap" autocomplete="off">
+        <input class="in" id="dsa-new" placeholder="Add a topic, e.g. Tries" style="max-width:280px" aria-label="New topic name">
+        <button class="btn" type="submit">Add topic</button>
+      </form>
+      <div class="topics" id="dsaTopics"></div>
+    </section>
+
+    <!-- FOCUS -->
+    <section class="view" id="view-focus" hidden>
+      <div class="vhead"><h2>Focus timer</h2><p>Work in timed sessions. Finished focus sessions are logged.</p></div>
+      <div class="focus">
+        <div class="panel timer">
+          <div class="seg" role="group" aria-label="Timer mode">
+            <button class="segb" data-act="mode" data-m="focus" aria-pressed="true">Focus</button>
+            <button class="segb" data-act="mode" data-m="break" aria-pressed="false">Break</button>
+          </div>
+          <div class="ringbox" id="ringbox">
+            <svg viewBox="0 0 220 220" aria-hidden="true">
+              <circle class="rtrack" cx="110" cy="110" r="100"></circle>
+              <circle class="rprog" id="tmRing" cx="110" cy="110" r="100" transform="rotate(-90 110 110)" stroke-dasharray="628.32" stroke-dashoffset="0"></circle>
+            </svg>
+            <div class="tmtxt"><b class="tm" id="tmTime" role="timer">25:00</b><span class="lbl" id="tmLbl">Focus</span></div>
+          </div>
+          <div class="tmbtns">
+            <button class="btn pri" id="tmStart" data-act="tmstart" style="min-width:110px">Start</button>
+            <button class="btn" data-act="tmreset">Reset</button>
+          </div>
+          <p class="msg" id="tmMsg" aria-live="polite"></p>
+          <div class="fields">
+            <label class="f"><span class="lbl">Working on</span><input class="in" id="f-label" data-k="flabel" placeholder="e.g. DAA unit 3"></label>
+            <label class="f"><span class="lbl">Focus (min)</span><input class="in num" id="f-len" type="number" min="1" max="180" inputmode="numeric" data-k="flen"></label>
+            <label class="f"><span class="lbl">Break (min)</span><input class="in num" id="f-brk" type="number" min="1" max="60" inputmode="numeric" data-k="fbrk"></label>
+          </div>
+        </div>
+        <div class="panel stack-col">
+          <div class="stats">
+            <div class="stat"><span class="lbl">Today</span><b id="fToday">0</b><span class="muted" style="font-size:.8125rem">minutes</span></div>
+            <div class="stat"><span class="lbl">Sessions</span><b id="fSessions">0</b><span class="muted" style="font-size:.8125rem">today</span></div>
+            <div class="stat"><span class="lbl">7 days</span><b id="fWeek">0</b><span class="muted" style="font-size:.8125rem">minutes</span></div>
+          </div>
+          <h3>Last 7 days</h3>
+          <div class="week" id="fChart" role="img" aria-label="Focus minutes for the last seven days"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIBRARY -->
+    <section class="view" id="view-library" hidden>
+      <div class="vhead"><h2>Resource library</h2><p id="libCount"></p></div>
+      <div class="libtools">
+        <input class="in" id="lib-q" data-k="libq" type="search" placeholder="Search resources" aria-label="Search resources">
+        <div class="chips" id="libChips"></div>
+      </div>
+      <div class="libgrid" id="libGrid"></div>
+    </section>
+  </main>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "semester-desk",
+  "version": "1.0.0",
+  "description": "A study hub for CSE students: CGPA calculator, attendance tracker, deadlines, DSA counter, focus timer and resource library.",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "test": "node tests/app.test.js && node tests/login.test.js"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1"
+  }
+}
